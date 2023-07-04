@@ -1,0 +1,215 @@
+:root
+{
+    --grid-columns: 4;
+    --grid-rows: 4;
+
+
+    --header-height: 60px;
+    --footer-height: 50px;
+    --sidebar-width: clamp(150px, 27%, 700px);
+
+    /* --background-lightness: 80%;
+    --text-lightness: 100%;
+     */
+
+    --palette-header: #c8ccba;
+    --palette-base: #abbb73;
+    --palette-new-game: #eff5ef;
+    --palette-sidebar: rgb(252, 250, 238);
+    
+    --grid_background_color:rgb(241, 241, 240);
+    
+
+    
+    font-family: "Arial", sans-serif;
+}
+
+*{
+    box-sizing: border-box;
+}
+
+body
+{
+    background: #f08;
+    font-size: 16pt;
+    text-align: center;
+    position: absolute;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden; /* disable horizontal scroll */
+    overflow-y: hidden; /* disable vertical scroll */
+}
+
+header
+{
+    background: var(--palette-header);
+    color:rgb(44, 62, 55);
+    font-weight: bold;
+    height: var(--header-height);
+    position: absolute;
+    text-align: center;
+    width: 100%;
+}
+
+header h1
+{
+    font-size: 30pt;
+    font-weight: bold;
+    margin: 0;
+    padding-top: 5px;
+    text-align: center;
+} 
+
+
+aside
+{
+    background: var(--palette-sidebar);
+    position: absolute;
+    top: var(--header-height);
+    width: var(--sidebar-width);
+    height: calc(100% - var(--header-height) - var(--footer-height));
+
+}
+
+.score_container
+{
+    /* position: absolute; */
+    /* top: var(--header-height); */
+    width: 100%;
+    text-align: center;
+    font-size: 5vmin;
+    color:rgb(44, 62, 55)
+}
+
+#new_game{
+    /* position: relative; */
+    background: var(--palette-base);
+    border-radius: 5%;
+    font-size: 3vmin;
+    padding: 5px;
+    color:white;
+}
+
+#introduction{
+    font-size:2.5vmin;
+    text-align: left;
+    margin:3vmin;
+    padding: 0;
+    position: relative;
+    color:rgb(44, 62, 55)
+}
+
+.sub_title{
+    text-align: center;
+    color:rgb(44, 62, 55);
+    font-size:3vmin;
+    font-weight: bold;
+    margin:1vmin;
+}
+
+main
+{
+    background: var(--palette-sidebar);
+    height: calc(100% - var(--header-height) - var(--footer-height));
+    left: var(--sidebar-width);
+    position: absolute;
+    top: var(--header-height);
+    width: calc(100% - var(--sidebar-width));
+}
+
+.grid
+{   
+    aspect-ratio: 1;
+    margin-left: 0;
+    margin-right: auto;
+    padding:10px;
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    background: var(--grid_background_color);
+}
+
+.row
+{
+    height: calc(100%/var(--grid-rows));
+    position: relative;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+ 
+.cell
+{
+    background: hsl(150, 40%, var(--background-lightness));
+    color: hsl(100, 50%, var(--text-lightness));
+    /* color: hsl(200, 25%, 90%); */
+    border: 1vmin solid rgba(41, 58, 51, 0.797);
+    border-radius: 2vmin;
+    font-size: 8vmin;
+    display: inline-block;
+    position: relative;
+    height: 100%;
+    width: calc(100% /var(--grid-columns));
+    margin: 0;
+    transition: 70ms ease-in-out;
+    vertical-align: bottom; /*align the cell*/
+    /* padding: 2vmin; */
+    scale: 0.9;
+    line-height :2;
+}
+
+footer
+{
+    background: var(--palette-base);
+    bottom: 0px;
+    height: var(--footer-height);
+    position: absolute;
+    width: 100%;
+    color: white;
+}
+
+#mask_layer{
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: none;
+    z-index: 5;
+}
+
+#over{
+    height: 50%;
+    width: 70%;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 15px;
+    top: 50%;
+    left: 50%;
+    margin-top: -20%;
+    margin-left: -35%;
+    position: relative;
+    text-align: center; 
+    z-index : 10;
+    display: none;
+    padding: 8vmin;
+    
+}
+
+#game_over{
+    font-size: 6vmin;
+    font-weight: bold;
+    color:rgb(44, 62, 55);
+    margin: 2vmin;
+}
+
+#restart
+{
+    background: var(--palette-base);
+    border-radius: 5%;
+    font-size: 3vmin;
+    padding: 5px;
+    color:white;
+    margin:2vmin;
+}

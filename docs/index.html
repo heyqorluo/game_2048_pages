@@ -1,0 +1,63 @@
+<!-- In HTML Comments are written like this -->
+<!-- They can all be removed for your apps -->
+<!doctype html> <!-- This first line tells browsers to expect modern standard html 5 -->
+<html lang="en-gb"> <!-- This is indicates the page is written in British English, useful for accessibility -->
+<meta charset="utf-8"> <!-- This indicates how the file is encoded. utf-8 is standard -->
+<title>game_2048</title> <!-- All pages need a title, this will be displayed in the browser's title bar -->
+<link rel="stylesheet" href="default.css"> <!-- Import style sheet – default.css -->
+<link rel="icon" href="./assets/favicon.png"> <!-- Import 'Favorites Icon' – favicon.png -->
+<script type="module" src="main.js"></script> <!-- Load the main script. Must be type="module". Have only one of these -->
+
+<header>
+    <h1 id="title">2048</h1>
+</header>
+
+<main>
+    <div id="grid" class="grid">
+        <div id="mask_layer">
+            <div id="over">
+                <div id="game_over">
+                    Game over
+                </div>
+                <div class="score_container">
+                    Score:<span id="score_final">0</span>
+                </div>
+                <button id="restart" >Restart</button>
+            </div>
+        </div>
+    </div>
+    
+</main>
+
+<aside>
+    
+    <a href="/docs/">API Documentation</a>
+
+    <div class="score_container">
+        <div id = "score_title">Score:<span id="score"> 0</span></div>
+    </div>
+    <div>
+        <button id = "new_game" >New Game</button>
+    </div>
+    <hr>
+    <div id = "introduction"> 
+        <div class="sub_title">
+            HOW TO PLAY: 
+        </div>
+        Use arrow keys to move tiles. When two tiles 
+        having the same number touch, they join into one!
+        <br />
+        <br />
+        <div class="sub_title">
+            NOTE:
+        </div>
+        - The score is the sum of all the cells on the board.
+        <br/>
+        - A new cell of value 2 or 4 will be added to the board every time you move.
+    </div>
+</aside>
+
+
+
+<footer id="footer">@2022_game_2048
+</footer>

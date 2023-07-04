@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>tests/2048_test.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="game_2048.html">game_2048</a><ul class='methods'><li data-type='method'><a href="game_2048.html#.calculate_score">calculate_score</a></li><li data-type='method'><a href="game_2048.html#.cell_background_color">cell_background_color</a></li><li data-type='method'><a href="game_2048.html#.cell_text_color">cell_text_color</a></li><li data-type='method'><a href="game_2048.html#.empty_board">empty_board</a></li><li data-type='method'><a href="game_2048.html#.filter_empty_cells">filter_empty_cells</a></li><li data-type='method'><a href="game_2048.html#.is_adjacent_cells_different">is_adjacent_cells_different</a></li><li data-type='method'><a href="game_2048.html#.is_board_full">is_board_full</a></li><li data-type='method'><a href="game_2048.html#.is_game_over">is_game_over</a></li><li data-type='method'><a href="game_2048.html#.slide">slide</a></li><li data-type='method'><a href="game_2048.html#.slideDown">slideDown</a></li><li data-type='method'><a href="game_2048.html#.slideLeft">slideLeft</a></li><li data-type='method'><a href="game_2048.html#.slideRight">slideRight</a></li><li data-type='method'><a href="game_2048.html#.slideUp">slideUp</a></li></ul></li><li><a href="Test_2048.html">Test_2048</a><ul class='methods'><li data-type='method'><a href="Test_2048.html#.throw_if_invalid">throw_if_invalid</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">tests/2048_test.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import game_2048 from "../common/game_2048.js";
+import R from "../common/ramda.js";
+/**
+ * 2048_test is a module to unit test the game 2048.
+ * @namespace Test_2048
+ * @author Peiqi Luo
+ * @version 2022-06-27
+ */
+
+const DISPLAY_MODE = "to_string";
+
+const display_functions = {
+    "json": JSON.stringify
+};
+const display_board = function (board) {
+    try {
+        return "\n" + display_functions[DISPLAY_MODE](board);
+    } catch (ignore) {
+        return "\n" + JSON.stringify(board);
+    }
+};
+
+
+/**
+ * Returns if the board is valid.
+ * A board is valid if all the following conditions are met:
+ * - The board is a square 2d array.
+ * - The board only contains numbers which are 0 or multiple of 2.
+ * @memberof Test_2048
+ * @function
+ * @param {Array} board The board to check.
+ * @throws {Error} If the board fails any of the above conditions.
+ */
+
+const throw_if_invalid = function (board) {
+    // 2d array.
+    if (!Array.isArray(board) || !Array.isArray(board[0])) {
+        throw new Error(
+            "The board is not a 2D array: " + display_board(board)
+        );
+    }
+    const height = board.length;
+    const square = R.all(
+        (row) => row.length === height,
+        board
+    );
+    // square board.
+    if (!square) {
+        throw new Error(
+            "The board is not square: " + display_board(board)
+        );
+    }
+    // all numbers are 0 or multiple of 2.
+    const all_multiple_of_2 = R.all(
+        (number) => number % 2 === 0,
+        R.flatten(board)
+    );
+    if (!all_multiple_of_2) {
+        throw new Error(
+            "The board contains non-multiple of 2 numbers: " +
+            display_board(board)
+        );
+    }
+};
+
+
+describe("Empty Board", function () {
+    it("An empty board is valid", function () {
+        const empty_board = game_2048.empty_board();
+        throw_if_invalid(empty_board);
+    });
+    it("An empty board is not ended.", function () {
+        const empty_board = game_2048.empty_board();
+        if (game_2048.is_game_over(empty_board)) {
+            throw new Error(
+                "An empty board should not be ended: " +
+                display_board(empty_board)
+            );
+        }
+    });
+    it("An empty board has only 0 cells.", function () {
+        const empty_board = game_2048.empty_board();
+        const all_0_cells = R.pipe(
+            R.flatten,
+            R.all(R.equals(0))
+        )(empty_board);
+        if (!all_0_cells) {
+            throw new Error(
+                "The empty board has non-0 cells: " +
+                display_board(empty_board)
+            );
+        }
+    });
+});
+
+
+const arbitrary_board = [
+    [0, 0, 0, 0],
+    [0, 2, 4, 16],
+    [0, 2, 8, 4],
+    [0, 2, 16, 2]
+];
+describe("Arbitrary board", function () {
+    it("Arbitrary board is valid", function () {
+        throw_if_invalid(arbitrary_board);
+    });
+    it("Given a arbitrary board;" +
+    "When making a move to the left;" +
+    "Then the board is still valid.", function () {
+        const moved_board = game_2048.slideLeft(arbitrary_board);
+        throw_if_invalid(moved_board);
+    });
+    it("Given a arbitrary board;" +
+    "When making a move to the right;" +
+    "Then the board is still valid.", function () {
+        const moved_board = game_2048.slideRight(arbitrary_board);
+        throw_if_invalid(moved_board);
+    });
+    it("Given a arbitrary board;" +
+    "When making a move to the up;" +
+    "Then the board is still valid.", function () {
+        const moved_board = game_2048.slideUp(arbitrary_board);
+        throw_if_invalid(moved_board);
+    });
+    it("Given a arbitrary board;" +
+    "When making a move to the down;" +
+    "Then the board is still valid.", function () {
+        const moved_board = game_2048.slideDown(arbitrary_board);
+        throw_if_invalid(moved_board);
+    });
+});
+
+
+describe("Game over", function () {
+    it("Given a board with no 0 cells; " +
+        "When checking if the board is full; " +
+        "Returns that the board is full.", function () {
+        const test_board = [
+            [2, 2, 2, 2],
+            [2, 2, 2, 2],
+            [2, 2, 2, 2],
+            [2, 2, 2, 2]
+        ];
+        if (!game_2048.is_board_full(test_board)) {
+            throw new Error(
+                "The board should be full: " +
+                display_board(test_board)
+            );
+        }
+    });
+    it("Given a board with different adjacent cells; " +
+    "When checking if the adjacent cells are all different" +
+    "Return that the adjacent cells are all different.", function () {
+        const test_board = [
+            [2, 4, 16, 8],
+            [0, 8, 2, 4],
+            [4, 2, 4, 0],
+            [32, 16, 8, 4]
+        ];
+        if (!game_2048.is_adjacent_cells_different(test_board)) {
+            throw new Error(
+                "The adjecent cells should be different in this board: " +
+                display_board(test_board)
+            );
+        }
+    });
+    it("Given a board with no 0 cells; " +
+        "and all adjacent cells are different; " +
+        "When checking if the board is ended" +
+        "Return that the board is ended.", function () {
+        const test_board = [
+            [4, 8, 2, 4],
+            [16, 2, 4, 2],
+            [2, 16, 8, 16],
+            [16, 4, 64, 32]
+        ];
+        if (!game_2048.is_game_over(test_board)) {
+            throw new Error(
+                "The board should be ended: " +
+                display_board(test_board)
+            );
+        }
+    });
+});
+
+
+describe("Example based testing", function () {
+    it("Left moves perform as expected", function () {
+        const start = [
+            [2, 2, 4, 4],
+            [2, 0, 0, 2],
+            [0, 0, 2, 2],
+            [0, 2, 4, 8]
+        ];
+        const expected = [
+            [4, 8, 0, 0],
+            [4, 0, 0, 0],
+            [4, 0, 0, 0],
+            [2, 4, 8, 0]
+        ];
+        const move_left = game_2048.slideLeft(start);
+        if (!R.equals(move_left, expected)) {
+            throw new Error(
+                "Left moves do not perform as expected: " +
+                display_board(move_left)
+            );
+        }
+    });
+    it("Right moves perform as expected", function () {
+        const start = [
+            [2, 2, 4, 4],
+            [2, 0, 0, 2],
+            [0, 0, 2, 2],
+            [0, 2, 4, 8]
+        ];
+        const expected = [
+            [0, 0, 4, 8],
+            [0, 0, 0, 4],
+            [0, 0, 0, 4],
+            [0, 2, 4, 8]
+        ];
+        const move_right = game_2048.slideRight(start);
+        if (!R.equals(move_right, expected)) {
+            throw new Error(
+                "Right moves do not perform as expected: " +
+                display_board(move_right)
+            );
+        }
+    });
+    it("Up moves perform as expected", function () {
+        const start = [
+            [2, 2, 4, 4],
+            [2, 0, 0, 2],
+            [0, 0, 2, 2],
+            [0, 2, 4, 8]
+        ];
+        const expected = [
+            [4, 4, 4, 4],
+            [0, 0, 2, 4],
+            [0, 0, 4, 8],
+            [0, 0, 0, 0]
+        ];
+        const move_up = game_2048.slideUp(start);
+        if (!R.equals(move_up, expected)) {
+            throw new Error(
+                "Up moves do not perform as expected: " +
+                display_board(move_up)
+            );
+        }
+    });
+    it("Down moves perform as expected", function () {
+        const start = [
+            [2, 2, 4, 4],
+            [2, 0, 0, 2],
+            [0, 0, 2, 2],
+            [0, 2, 4, 8]
+        ];
+        const expected = [
+            [0, 0, 0, 0],
+            [0, 0, 4, 4],
+            [0, 0, 2, 4],
+            [4, 4, 4, 8]
+        ];
+        const move_down = game_2048.slideDown(start);
+        if (!R.equals(move_down, expected)) {
+            throw new Error(
+                "Down moves do not perform as expected: " +
+                display_board(move_down)
+            );
+        }
+    });
+});
+
+
+describe("Score calculator", function () {
+    it("Given an empty board; " +
+    "When calculating the score; " +
+    "The score is 0.", function () {
+        const empty_board = game_2048.empty_board();
+        const score = game_2048.calculate_score(empty_board);
+        if (score !== 0) {
+            throw new Error(
+                "The score should be 0: " +
+                display_board(empty_board)
+            );
+        }
+    });
+    it("Given a valid board; " +
+    "After moving left, " +
+    "when calculating the score; " +
+    "the score remains the same.", function () {
+        const test_board = [
+            [2, 2, 4, 4],
+            [2, 0, 0, 2],
+            [0, 0, 2, 2],
+            [0, 2, 4, 8]
+        ];
+        const score = game_2048.calculate_score(test_board);
+        const moved_board = game_2048.slideLeft(test_board);
+        const moved_score = game_2048.calculate_score(moved_board);
+        if (score !== moved_score) {
+            throw new Error(
+                "The score should remain the same: " +
+                display_board(test_board)
+            );
+        }
+    });
+});</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Mon Jun 27 2022 23:17:05 GMT+0100 (British Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>

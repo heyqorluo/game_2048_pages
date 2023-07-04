@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>game_2048.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="game_2048.html">game_2048</a><ul class='methods'><li data-type='method'><a href="game_2048.html#.calculate_score">calculate_score</a></li><li data-type='method'><a href="game_2048.html#.cell_background_color">cell_background_color</a></li><li data-type='method'><a href="game_2048.html#.cell_text_color">cell_text_color</a></li><li data-type='method'><a href="game_2048.html#.empty_board">empty_board</a></li><li data-type='method'><a href="game_2048.html#.filter_empty_cells">filter_empty_cells</a></li><li data-type='method'><a href="game_2048.html#.is_adjacent_cells_different">is_adjacent_cells_different</a></li><li data-type='method'><a href="game_2048.html#.is_board_full">is_board_full</a></li><li data-type='method'><a href="game_2048.html#.is_game_over">is_game_over</a></li><li data-type='method'><a href="game_2048.html#.slide">slide</a></li><li data-type='method'><a href="game_2048.html#.slideDown">slideDown</a></li><li data-type='method'><a href="game_2048.html#.slideLeft">slideLeft</a></li><li data-type='method'><a href="game_2048.html#.slideRight">slideRight</a></li><li data-type='method'><a href="game_2048.html#.slideUp">slideUp</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">game_2048.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import R from "./ramda.js";
+/**
+ * game_2048.js is a game to model and simulate the game 2048.
+ * 2048 is a single-player game played on a plain 4×4 grid,
+ * with numbered tiles that slide when a player moves them
+ * using the four arrow keys.
+ * https://en.wikipedia.org/wiki/2048_(video_game)
+ * @namespace game_2048
+ * @author Peiqi Luo
+ * @version 2022-06-27
+ */
+
+const game_2048 = Object.create(null);
+
+/**
+ * Create a new empty board.
+ * Returns a standard 4 wide, 4 high board.
+ * @memberof game_2048
+ * @function
+ * @returns {Array} An empty board for starting a game.
+ */
+game_2048.empty_board = () => [
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0],
+    [0, 0, 0, 0]
+];
+
+// game_2048.empty_board = [
+//             [0, 2, 2, 2],
+//             [2, 2, 2, 2],
+//             [4, 4, 8, 8],
+//             [4, 4, 8, 8]
+//         ];
+
+
+/**
+ * Determine the background color of the cell.
+ * When the value increases, the lightness of the background color decreases.
+ * @memberof game_2048
+ * @function
+ * @param {number} num The value of the cell.
+ * @returns {number} The lightness of the background color of the cell.
+ */
+game_2048.cell_background_color = function (num) {
+    let power = Math.log2(num);
+    let background_lightness = 100 - power * 10;
+    return background_lightness;
+};
+
+
+/**
+ * Determine the text color of the cell.
+ * When the value increases, the lightness of the text color increases.
+ * @memberof game_2048
+ * @function
+ * @param {number} background_lightness The value of the cell.
+ * @returns {number} The lightness of the text color of the cell.
+ */
+game_2048.cell_text_color = function (background_lightness) {
+    let text_lightness = (background_lightness &lt;= 50 ? 95 : 18);
+    return text_lightness;
+};
+
+
+/**
+ * Check if the board is full.
+ * @memberof game_2048
+ * @function
+ * @param {Array} board The board to check.
+ * @param {number} grid_rows The number of rows in the board.
+ * @param {number} grid_columns The number of columns in the board.
+ * @returns {boolean} Whether the board is full.
+ * It returns true if the board is full.
+ */
+game_2048.is_board_full = function (board, grid_rows = 4, grid_columns = 4) {
+    let flag = 1;
+    R.range(0, grid_rows).forEach(function (row_index) {
+        R.range(0, grid_columns).forEach(function (column_index) {
+            if (board[row_index][column_index] === 0) {
+                flag = 0;
+            }
+        });
+    });
+    return flag !== 0;
+};
+
+
+/**
+ * Check if the adjacent cells are all different.
+ * @memberof game_2048
+ * @function
+ * @param {Array} board The board to check.
+ * @param {number} grid_rows The number of rows in the board.
+ * @param {number} grid_columns The number of columns in the board.
+ * @returns {boolean} Whether the adjacent cells are all different.
+ * It returns true if the adjacent cells are all different.
+ */
+game_2048.is_adjacent_cells_different = function (board, grid_rows = 4, grid_columns = 4) {
+    let flag = 1;
+    R.range(0, grid_rows).forEach(function (row_index) {
+        R.range(0, grid_columns - 1).forEach(function (column_index) {
+            if (board[row_index][column_index] === board[row_index]
+            [column_index + 1]) {
+                flag = 0;
+            }
+        });
+    });
+
+    R.range(0, grid_columns).forEach(function (column_index) {
+        R.range(0, grid_rows - 1).forEach(function (row_index) {
+            if (board[row_index][column_index] === board[row_index + 1]
+            [column_index]) {
+                flag = 0;
+            }
+        });
+    });
+    return flag !== 0;
+};
+
+/**
+ * Check if the game is over.
+ * @memberof game_2048
+ * @function
+ * @param {Array} board The board to check.
+ * @returns {boolean} Whether the game is over.
+ */
+game_2048.is_game_over = function (board) {
+    return (game_2048.is_board_full(board)
+        &amp;&amp; game_2048.is_adjacent_cells_different(board));
+};
+
+
+/**
+ * Filter all the cells in a row that have a value of 0.
+ * Create a new row without 0 cells.
+ * @memberof game_2048
+ * @function
+ * @param {Array} row The row to clean.
+ * @returns {Array} The cleaned row without cells with value 0.
+ */
+game_2048.filter_empty_cells = function (row) {
+    return row.filter((num) => num !== 0);
+};
+
+
+/**
+ * Move and combine cells in the same row.
+ * @memberof game_2048
+ * @function
+ * @param {Array} row The row to move.
+ * @param {number} grid_columns The number of columns in the board.
+ * @returns {Array} The moved row.
+ */
+game_2048.slide = function (row, grid_columns = 4) {
+    let new_row = game_2048.filter_empty_cells(row);
+    R.range(0, new_row.length).forEach(function (column_index) {
+        if (new_row[column_index] === new_row[column_index + 1]) {
+            new_row[column_index] = new_row[column_index] * 2;
+            new_row[column_index + 1] = 0;
+            // score += new_row[column_index];
+        }
+    });
+    //filter the empty cells AGAIN.
+    new_row = game_2048.filter_empty_cells(new_row);
+
+    //add zeroes back to the end of the new_row.
+    while (new_row.length &lt; grid_columns) {
+        new_row.push(0);
+    }
+
+    return new_row;
+};
+
+
+/**
+ * Slide the cells to the left.
+ * @memberof game_2048
+ * @function
+ * @param {Array} board The board to move.
+ * @param {number} grid_rows The number of rows in the board.
+ * @returns {Array} The board after moving the cells to the left.
+ */
+game_2048.slideLeft = function (board, grid_rows = 4) {
+    let new_board = R.clone(board);
+    R.range(0, grid_rows).forEach(function (row_index) {
+        let row = new_board[row_index];
+        row = game_2048.slide(row);
+        new_board[row_index] = row;
+    });
+    return new_board;
+};
+
+
+/**
+ * Slide the cells to the right.
+ * @memberof game_2048
+ * @function
+ * @param {Array} board The board to move.
+ * @param {number} grid_rows The number of rows in the board.
+ * @returns {Array} The board after moving the cells to the right.
+ */
+game_2048.slideRight = function (board, grid_rows = 4) {
+    let new_board = R.clone(board);
+    R.range(0, grid_rows).forEach(function (row_index) {
+        let row = new_board[row_index];
+        row = R.reverse(row);
+        row = game_2048.slide(row);
+        row = R.reverse(row);
+        new_board[row_index] = row;
+    });
+    return new_board;
+};
+
+
+/**
+ * Slide the cells to the up.
+ * @memberof game_2048
+ * @function
+ * @param {Array} board The board to move.
+ * @param {number} grid_rows The number of rows in the board.
+ * @param {number} grid_columns The number of columns in the board.
+ * @returns {Array} The board after moving the cells to the up.
+ */
+game_2048.slideUp = function (board, grid_rows = 4, grid_columns = 4) {
+    let new_board = R.clone(board);
+    R.range(0, grid_columns).forEach(function (column_index) {
+        let column = R.map(R.prop(column_index), new_board);
+        column = game_2048.slide(column);
+        R.range(0, grid_rows).forEach(function (row_index) {
+            new_board[row_index][column_index] = column[row_index];
+        });
+    });
+    return new_board;
+};
+
+/**
+ * Slide the cells to the down.
+ * @memberof game_2048
+ * @function
+ * @param {Array} board The board to move.
+ * @param {number} grid_rows The number of rows in the board.
+ * @param {number} grid_columns The number of columns in the board.
+ * @returns {Array} The board after moving the cells to the down.
+ */
+game_2048.slideDown = function (board, grid_rows = 4, grid_columns = 4) {
+    let new_board = R.clone(board);
+    R.range(0, grid_columns).forEach(function (column_index) {
+        let column = R.map(R.prop(column_index), new_board);
+        column = R.reverse(column);
+        column = game_2048.slide(column);
+        column = R.reverse(column);
+        R.range(0, grid_rows).forEach(function (row_index) {
+            new_board[row_index][column_index] = column[row_index];
+        });
+    });
+    return new_board;
+};
+
+
+/**
+ * Calculate the score of the board.
+ * The score is the sum of all the cells on the board.
+ * @memberof game_2048
+ * @function
+ * @param {Array} board The board to calculate the score.
+ * @param {number} grid_rows The number of rows in the board.
+ * @param {number} grid_columns The number of columns in the board.
+ * @returns {number} The updated score of the board.
+ */
+
+game_2048.calculate_score = function (board) {
+    return R.sum(R.map(R.sum, board));
+};
+
+export default Object.freeze(game_2048);</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.10</a> on Tue Jun 28 2022 10:37:06 GMT+0100 (British Summer Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+
+
+</body>
+</html>
