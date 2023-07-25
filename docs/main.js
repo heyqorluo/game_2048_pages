@@ -1,5 +1,6 @@
 // import R from "../common/ramda.js";
-import R from "./ramda.min.js";
+// import R from "./ramda.min.js";
+import * as R from "ramda";
 import game_2048 from "./game_2048.js";
 
 
