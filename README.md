@@ -1,2 +1,2 @@
-# Computing 2 Coursework Submission.
-# This is a re-built version of the game 2048 as part of the coursework for year 1 Computing 2 module.
+# Game 2048.
+# This repo is reorganised to be deployed by GitHub Pages. The original file, including API and unit tests, can be found in the GitHub repository "game_2048_original".
