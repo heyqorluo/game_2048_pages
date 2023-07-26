@@ -1,5 +1,5 @@
-// import R from "./ramda.min.js";
-import * as R from "ramda";
+import R from "./ramda.min.js";
+
 /**
  * game_2048.js is a game to model and simulate the game 2048.
  * 2048 is a single-player game played on a plain 4×4 grid,
